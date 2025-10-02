@@ -2,7 +2,7 @@ import os
 import shutil
 import pandas as pd
 from datetime import datetime
-from utils import importar_planilhas, padronizar_colunas
+from utils import importar_planilhas, padronizar_colunas, gerar_relatorios
 from db import SessionLocal, Lancamento, init_db
 
 # -------------------------------
@@ -13,8 +13,8 @@ def importar_para_db():
     session = SessionLocal()
 
     pasta_uploads = "uploads"
-    pasta_processados = "uploads_processados"
-    os.makedirs(pasta_processados, exist_ok=True)
+    pasta_uploads_processados = "uploads_processados"
+    os.makedirs(pasta_uploads_processados, exist_ok=True)
 
     planilhas = importar_planilhas(pasta_uploads)
     if not planilhas:
@@ -46,10 +46,10 @@ def importar_para_db():
     # Mover arquivos processados
     for arq in arquivos_processados:
         origem = os.path.join(pasta_uploads, arq)
-        destino = os.path.join(pasta_processados, arq)
+        destino = os.path.join(pasta_uploads_processados, arq)
         if os.path.exists(origem):
             shutil.move(origem, destino)
-            print(f"📂 Arquivo movido para {pasta_processados}: {arq}")
+            print(f"📂 Arquivo movido para {pasta_uploads_processados}: {arq}")
 
 # -------------------------------
 # 2) Gerar relatórios do Banco

@@ -31,4 +31,13 @@ df3 = pd.DataFrame({
 })
 df3.to_excel("uploads/Escritorio_Teste.xlsx", index=False)
 
-print("Arquivos de exemplo criados em uploads/: Padaria_Pao_Doce.xlsx e Oficina_Rocha.xlsx")
+df3 = pd.DataFrame({
+    "Cliente": ["Oficina Boq Parafuso"]*3,
+    "dia": ["05/09/2025", "12/09/2025", "22/09/2025"],
+    "Descricao": ["Serviço Boq Parafuso", "Compra peças", "Serviço Reestocagem"],
+    "Receita": ["2.200,00", "0,00", "3.000,00"],
+    "Custo": ["0,00", "1.000,00", "0,00"]
+})
+df3.to_excel("uploads/Oficina_Boq_Parafuso.xlsx", index=False)
+
+print("Arquivos de exemplo criado")
