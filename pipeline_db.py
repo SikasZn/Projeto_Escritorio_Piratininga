@@ -80,3 +80,5 @@ def gerar_relatorios_db():
 if __name__ == "__main__":
     importar_para_db()      # 1) Sobe Excel para o banco
     gerar_relatorios_db()   # 2) Gera relatórios do banco
+
+#teste
