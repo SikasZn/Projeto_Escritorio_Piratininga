@@ -5,40 +5,64 @@ from fpdf import FPDF
 from datetime import datetime
 
 # ---------------------------
-# Padronização de colunas
+# Função segura de conversão numérica
 # ---------------------------
 def _parse_currency(x):
+    """Converte valores em texto (como 'R$ 1.234,56' ou '1,2mil') para float.
+       Se não for número válido, retorna 0.0."""
     if pd.isna(x):
-        return None
+        return 0.0
+
+    # Se já for número
     if isinstance(x, (int, float)):
         return float(x)
-    s = str(x).strip().replace("R$", "").replace(" ", "")
-    s = s.replace(".", "").replace(",", ".")
-    s = re.sub(r"[^0-9\.\-]", "", s)
-    return float(s) if s else None
 
+    # Converter texto para número
+    s = str(x).strip().lower()
+
+    # Remover símbolos e palavras irrelevantes
+    s = s.replace("r$", "").replace("reais", "").replace("mil", "000")
+    s = s.replace(" ", "").replace(".", "").replace(",", ".")
+
+    # Extrair apenas dígitos e ponto
+    s = re.sub(r"[^0-9\.\-]", "", s)
+
+    try:
+        return float(s)
+    except:
+        return 0.0  # se não der pra converter, zera
+
+# ---------------------------
+# Padronização de colunas
+# ---------------------------
 def padronizar_colunas(df):
+    """Renomeia colunas diversas para o padrão esperado do sistema"""
     equivalencias = {
         "cliente": "Cliente", "empresa": "Cliente", "nome": "Cliente",
         "data": "Data", "dia": "Data",
         "descrição": "Descrição", "descricao": "Descrição", "detalhes": "Descrição",
         "valor": "Receita (R$)", "receita": "Receita (R$)", "entrada": "Receita (R$)",
-        "despesa": "Despesa (R$)", "custo": "Despesa (R$)", "saida": "Despesa (R$)"
+        "despesa": "Despesa (R$)", "custo": "Despesa (R$)", "saida": "Despesa (R$)",
     }
+
     colunas = {}
     for col in df.columns:
         chave = col.lower().strip()
         colunas[col] = equivalencias.get(chave, col)
+
     df = df.rename(columns=colunas)
 
+    # Garante que todas as colunas esperadas existam
     for c in ["Cliente", "Data", "Descrição", "Receita (R$)", "Despesa (R$)"]:
         if c not in df.columns:
             df[c] = None
 
+    # Converter tipos de dados
+    df["Data"] = pd.to_datetime(df["Data"], errors="coerce", dayfirst=True)
     df["Receita (R$)"] = df["Receita (R$)"].apply(_parse_currency)
     df["Despesa (R$)"] = df["Despesa (R$)"].apply(_parse_currency)
-    df["Data"] = pd.to_datetime(df["Data"], errors="coerce", dayfirst=True)
 
+    # Reordenar
     return df[["Cliente", "Data", "Descrição", "Receita (R$)", "Despesa (R$)"]]
 
 # ---------------------------

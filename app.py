@@ -105,17 +105,8 @@ def upload():
                 cliente=row["Cliente"] or empresa,
                 data=row["Data"].date() if pd.notna(row["Data"]) else datetime.now().date(),
                 descricao=row["Descrição"] or "",
-                receita=receita,
-                despesa=despesa,
-                try:
-                    receita = float(row["Receita (R$)"]) if pd.notna(row["Receita (R$)"]) else 0.0
-                except:
-                    receita = 0.0
-
-                try:
-                    despesa = float(row["Despesa (R$)"]) if pd.notna(row["Despesa (R$)"]) else 0.0
-                except:
-                despesa = 0.0
+                receita=float(row["Receita (R$)"]) if pd.notna(row["Receita (R$)"]) else 0.0,
+                despesa=float(row["Despesa (R$)"]) if pd.notna(row["Despesa (R$)"]) else 0.0,
             )
             session.add(lanc)
 
