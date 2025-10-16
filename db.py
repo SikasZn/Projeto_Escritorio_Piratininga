@@ -4,10 +4,8 @@ import os
 
 # 🔑 Configure sua URL do Render/AWS/Railway aqui
 # Exemplo: postgresql+psycopg2://usuario:senha@host:5432/banco
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://piratininga_db_user:IzLVRJ8GWGuUoicPZSvmg08AeQ04JZMt@dpg-d3eqovumcj7s73dnst90-a.oregon-postgres.render.com/piratininga_db"
-)
+DATABASE_URL = "postgresql+psycopg2://postgres:123456@localhost:5432/piratininga_db"
+
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)

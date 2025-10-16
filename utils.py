@@ -8,29 +8,45 @@ from datetime import datetime
 # Função segura de conversão numérica
 # ---------------------------
 def _parse_currency(x):
-    """Converte valores em texto (como 'R$ 1.234,56' ou '1,2mil') para float.
-       Se não for número válido, retorna 0.0."""
+    """
+    Converte valores monetários em float, aceitando formatos:
+    - 'R$ 1.234,56'
+    - '1.234,56'
+    - '1234,56'
+    - '1,234.56'
+    - 'R$1,234.56'
+    - '1 234,56'
+    Retorna 0.0 se o valor for inválido.
+    """
     if pd.isna(x):
         return 0.0
 
-    # Se já for número
     if isinstance(x, (int, float)):
         return float(x)
 
-    # Converter texto para número
-    s = str(x).strip().lower()
+    s = str(x).strip()
 
-    # Remover símbolos e palavras irrelevantes
-    s = s.replace("r$", "").replace("reais", "").replace("mil", "000")
-    s = s.replace(" ", "").replace(".", "").replace(",", ".")
+    # Remove símbolos e espaços invisíveis
+    s = s.replace("R$", "").replace("reais", "").replace(" ", "").replace("\xa0", "")
 
-    # Extrair apenas dígitos e ponto
+    # Corrigir casos mistos (como '1,234.56' ou '1.234,56')
+    # Se houver vírgula e ponto, detectar qual é decimal
+    if "," in s and "." in s:
+        if s.rfind(",") > s.rfind("."):  # vírgula vem por último => decimal brasileiro
+            s = s.replace(".", "").replace(",", ".")
+        else:  # decimal americano
+            s = s.replace(",", "")
+    else:
+        # Se só vírgula => decimal brasileiro
+        s = s.replace(",", ".")
+
+    # Manter apenas números, ponto e sinal negativo
     s = re.sub(r"[^0-9\.\-]", "", s)
 
     try:
         return float(s)
-    except:
-        return 0.0  # se não der pra converter, zera
+    except ValueError:
+        return 0.0
 
 # ---------------------------
 # Padronização de colunas
